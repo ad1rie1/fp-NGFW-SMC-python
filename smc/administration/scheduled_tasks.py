@@ -537,7 +537,7 @@ class RemoteUpgradeTask(ScheduledTaskMixin, Element):
     typeof = 'remote_upgrade_task'
 
     @classmethod
-    def create(cls, name, engines_or_nodes, package, comment=None, **kwargs):
+    def create(cls, name, engines_or_nodes, package, comment=None, force_upgrade=False, **kwargs):
         """
         Create an upload policy task associated with specific
         engines or nodes. A policy reassigns any policies that might be
@@ -548,6 +548,7 @@ class RemoteUpgradeTask(ScheduledTaskMixin, Element):
         :type engines_or_nodes: list(Engine) or list(Nodes) or list(Engine/Node)
         :param str package: Package to assign to the engine/s
         :param str comment: optional comment
+        :param force_upgrade: Force the package installation if it has a certificate problem.
         :raises ElementNotFound: engine specified does not exist
         :raises CreateElementFailed: failure to create the task
         :return: a task object
@@ -566,7 +567,11 @@ class RemoteUpgradeTask(ScheduledTaskMixin, Element):
             'name': name,
             'engine_upgrade_filename': package,
             'resources': nodeList,
-            'comment': comment}
+            'comment': comment,
+            'force_upgrade': force_upgrade}
+        
+        if kwargs:
+            json.update(**kwargs)
 
         return ElementCreator(cls, json)
 
